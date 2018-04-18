@@ -72,9 +72,10 @@ double findMin(const BM& bm, double eps, long long int maxstep, int n_thr) {
     double recordVal = std::numeric_limits<double>::max();
     
     long long int step = 0;
+    long long pool_size = 0;
     auto start = std::chrono::system_clock::now();
     while (1) {
-#pragma omp parallel shared(pool, pool_new, recordVec, recordVal) firstprivate(c) num_threads(n_thr)
+#pragma omp parallel shared(pool, pool_new, recordVec, recordVal, step, pool_size) firstprivate(c) num_threads(n_thr)
 {
 #pragma omp for 
         for(int i = 0; i < n_thr; i++) pool_new[i].clear();
@@ -97,14 +98,14 @@ double findMin(const BM& bm, double eps, long long int maxstep, int n_thr) {
             double rv;
 #pragma omp atomic read
             rv = recordVal;
-            if (lb <= rv - eps) 
+            if (lb <= rv - eps && pool_size + step < maxstep) 
                split(b, pool_new[thread_num]);
             
         }
 }
         for(int i = 0; i < n_thr; i++) step += pool[i].size();
         if(step >= maxstep) break;
-        long long pool_size = 0;
+        pool_size = 0;
         for(int i = 0; i < n_thr; i++) pool_size += pool_new[i].size();
         if(pool_size == 0) break;
         if(pool_size + step >= maxstep) {
