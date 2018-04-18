@@ -3,7 +3,7 @@
  */
 
 /* 
- * File:   tutorialbnb.cpp
+ * File:   bnb_test_prelim.cpp fork from tutorialbnb.cpp
  * Author: Gorchakov A.Y.
  *
  * Created on Apr 18, 2018, 4:12 PM
